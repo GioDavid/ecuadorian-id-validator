@@ -1,0 +1,14 @@
+{
+  "name": "ecuadorian-identification-validation",
+  "description": "This element inherits from the iron-validator-behavior and override the validation for a paper input to check if the identification is an ecuadorian id card or if it&#39;s a RUC (business id)",
+  "main": "ecuadorian-identification-validation.html",
+  "dependencies": {
+    "polymer": "Polymer/polymer#^1.4.0"
+  },
+  "devDependencies": {
+    "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",
+    "iron-demo-helpers": "PolymerElements/iron-demo-helpers#^1.0.0",
+    "web-component-tester": "^4.0.0",
+    "webcomponentsjs": "webcomponents/webcomponentsjs#^0.7.0"
+  }
+}

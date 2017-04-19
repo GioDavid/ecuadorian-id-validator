@@ -1,0 +1,34 @@
+<link rel="import" href="../polymer/polymer.html">
+
+<!--
+`ecuadorian-identification-validation`
+This element inherits from the iron-validator-behavior and override the validation for a paper input to check if the identification is an ecuadorian id card or if it&#39;s a RUC (business id)
+
+@demo demo/index.html 
+-->
+
+<dom-module id="ecuadorian-identification-validation">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+    <h2>Hello [[prop1]]</h2>
+  </template>
+
+  <script>
+    Polymer({
+
+      is: 'ecuadorian-identification-validation',
+
+      properties: {
+        prop1: {
+          type: String,
+          value: 'ecuadorian-identification-validation',
+        },
+      },
+
+    });
+  </script>
+</dom-module>
