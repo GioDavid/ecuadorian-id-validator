@@ -12,7 +12,6 @@ Developer: David Proaño <davisxdpfr@gmail.com>
 This element inherits from the iron-validator-behavior and override the validation for a paper input to check if the identification is an ecuadorian id card or if it&#39;s a RUC (business id)
 @demo demo/index.html 
 -->
-
 <dom-module id="ecuadorian-identification-validation">
     <script>
         Polymer({
@@ -113,7 +112,7 @@ This element inherits from the iron-validator-behavior and override the validati
              * @return {Boolean} true if `values` is valid.
              */
             _checkBusiness: function(value) {
-                businessTotal = value.substring(9, 12);
+                businessTotal = value.substring(10, 13);
                 return businessTotal !== '000';
             },
 

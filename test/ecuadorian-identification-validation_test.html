@@ -68,6 +68,12 @@
             assert.equal(element.type, 'natural_person_ruc');
         });
 
+        test('validate a bad identification with no business', function() {
+            var element = fixture('ruc');
+            assert.isFalse(element.validate('1710034065000'), 'the identification should be correct');
+            assert.equal(element.type, 'natural_person_ruc');
+        });
+
     });
 </script>
 </body>
