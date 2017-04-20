@@ -1,30 +1,74 @@
 <!doctype html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes">
 
     <title>ecuadorian-identification-validation test</title>
 
-    <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
-    <script src="../../web-component-tester/browser.js"></script>
+    <script src="../../app/bower_components/webcomponentsjs/webcomponents-lite.js"></script>
+    <script src="../../app/bower_components/web-component-tester/browser.js"></script>
+
+    <link rel="import" href="../../app/bower_components/paper-input/paper-input.html">
 
     <link rel="import" href="../ecuadorian-identification-validation.html">
-  </head>
-  <body>
-    <test-fixture id="basic">
-      <template>
-        <ecuadorian-identification-validation></ecuadorian-identification-validation>
-      </template>
-    </test-fixture>
+</head>
+<body>
+<test-fixture id="basic">
+    <template>
+        <ecuadorian-identification-validation id="validator"
+                                              validator-name="idValidator"></ecuadorian-identification-validation>
+    </template>
+</test-fixture>
+<test-fixture id="ruc">
+    <template>
+        <ecuadorian-identification-validation id="validatorRUC" type="RUC"
+                                              validator-name="idValidator"></ecuadorian-identification-validation>
+    </template>
+</test-fixture>
 
-    <script>
-      suite('ecuadorian-identification-validation', function() {
+<script>
+    suite('ecuadorian-identification-validation', function() {
+
         test('instantiating the element works', function() {
-          var element = fixture('basic');
-          assert.equal(element.is, 'ecuadorian-identification-validation');
+            var element = fixture('basic');
+            assert.equal(element.is, 'ecuadorian-identification-validation');
+            assert.equal(element.type, 'idCard');
+            assert.equal(element.validatorName, 'idValidator');
         });
-      });
-    </script>
-  </body>
+
+        test('instantiating a RUC', function() {
+            var element = fixture('ruc');
+            assert.equal(element.is, 'ecuadorian-identification-validation');
+            assert.equal(element.type, 'RUC');
+            assert.equal(element.validatorName, 'idValidator');
+        });
+
+        test('validate a good identification', function() {
+            var element = fixture('basic');
+            assert.equal(element.type, 'idCard');
+            assert.isTrue(element.validate('1715140305'), 'the identification should have a 10 in length');
+        });
+
+        test('validate an bad identification with bad length', function() {
+            var element = fixture('basic');
+            assert.equal(element.type, 'idCard');
+            assert.isFalse(element.validate('171514030'), 'the identification should have a 10 in length');
+        });
+
+        test('validate an bad identification with incorrect number', function() {
+            var element = fixture('basic');
+            assert.equal(element.type, 'idCard');
+            assert.isFalse(element.validate('1715140306'), 'the identification should have a 10 in length');
+        });
+
+        test('validate an bad identification with incorrect number', function() {
+            var element = fixture('basic');
+            assert.equal(element.type, 'idCard');
+            assert.isFalse(element.validate('1715880305'), 'the identification should have a 10 in length');
+        });
+
+    });
+</script>
+</body>
 </html>

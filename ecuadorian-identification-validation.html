@@ -1,34 +1,135 @@
-<link rel="import" href="../polymer/polymer.html">
+<!--
+coding: utf-8
+@license
+Copyleft (C) 2017
+Developer: David Proaño <davisxdpfr@gmail.com>
+-->
 
+<link rel="import" href="../app/bower_components/polymer/polymer.html">
+<link rel="import" href="../app/bower_components/iron-validator-behavior/iron-validator-behavior.html">
 <!--
 `ecuadorian-identification-validation`
 This element inherits from the iron-validator-behavior and override the validation for a paper input to check if the identification is an ecuadorian id card or if it&#39;s a RUC (business id)
-
 @demo demo/index.html 
 -->
 
 <dom-module id="ecuadorian-identification-validation">
-  <template>
-    <style>
-      :host {
-        display: block;
-      }
-    </style>
-    <h2>Hello [[prop1]]</h2>
-  </template>
+    <script>
+        Polymer({
 
-  <script>
-    Polymer({
+            is: 'ecuadorian-identification-validation',
 
-      is: 'ecuadorian-identification-validation',
+            behaviors: [
+                Polymer.IronValidatorBehavior
+            ],
 
-      properties: {
-        prop1: {
-          type: String,
-          value: 'ecuadorian-identification-validation',
-        },
-      },
+            properties: {
+                /**
+                 * Used to identify if the validation is going to be done to an idCard or a RUC.
+                 */
+                type: {
+                    type: String,
+                    value: 'idCard'
+                },
+                /**
+                 * Used to verify what kind of identifier is.
+                 */
+                _thirdDigit: {
+                    type: Number,
+                    value: 6
+                },
+                /**
+                 * Minimum province number in Ecuador.
+                 */
+                _minProvince: {
+                    type: Number,
+                    value: 1
+                },
+                /**
+                 * Maximum province number in Ecuador.
+                 */
+                _maxProvince: {
+                    type: Number,
+                    value: 22
+                },
 
-    });
-  </script>
+                _coefficients: {
+                    type: Array,
+                    value: function() {
+                        return ["2", "1", "2", "1", "2", "1", "2", "1", "2"];
+                    }
+                }
+            },
+
+            /**
+             * check if a value is an idCard or a RUC, then call the validation methods according to the type of field.
+             * @param {Object} values The value to validate. May be any type depending on the validation logic.
+             * @return {Boolean} true if `values` is valid.
+             */
+            validate: function(value) {
+                if (value.length === 13) {
+                    //TODO implement RUC validation
+                    return this.validateIdCard(value);
+                } else if (value.length === 10) {
+                    return this.validateIdCard(value);
+                } else {
+                    return false;
+                }
+            },
+
+            /**
+             * Verify if the idCard is correct according to the ecuadorian id verification.
+             * @param {Object} values The value to validate. May be any type depending on the validation logic.
+             * @return {Boolean} true if `values` is valid.
+             */
+            validateIdCard: function(value) {
+
+                var id = String(value);
+                var province = id.substring(0, 2);
+                var thirdNumber = id.substring(2, 3);
+
+                if (this._between(province, this._minProvince, this._maxProvince) && thirdNumber < this._thirdDigit) {
+                    var digits = this._splitIdentification(value);
+                    return this._getVerifyTotal(digits);
+                } else {
+                    return false;
+                }
+            },
+
+            /**
+             * this function verify if an ecuadorian idCard is correct.
+             * @param {Array} list of the numbers contained in the ecuadorian idCard.
+             * @return {Boolean} true if `values` is valid.
+             */
+            _getVerifyTotal: function(digits) {
+
+                var verifyNumber = digits[9];
+                var total = 0;
+
+                for (var i = 0; i < this._coefficients.length; i++) {
+                    var value = this._coefficients[i] * digits[i];
+                    total = value >= 10 ? total + (value - 9) : total + value;
+                }
+
+                var verifyDigit = total >= 10 ? (total % 10) != 0 ? 10 - (total % 10) : (total % 10) : total;
+
+                return verifyNumber === String(verifyDigit);
+            },
+
+            _splitIdentification: function(value) {
+                return numbers = value.split('');
+            },
+
+            /**
+             * Compares if the x number is between the given min and max numbers.
+             * @param {Number} value to compare.
+             * @param {Number} min value to compare.
+             * @param {Number} max value to compare.
+             * @return {Boolean} true if `values` is valid.
+             */
+            _between: function(x, min, max) {
+                return x >= min && x <= max;
+            }
+        });
+    </script>
 </dom-module>
