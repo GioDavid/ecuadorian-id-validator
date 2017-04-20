@@ -22,7 +22,7 @@
 </test-fixture>
 <test-fixture id="ruc">
     <template>
-        <ecuadorian-identification-validation id="validatorRUC" type="RUC"
+        <ecuadorian-identification-validation id="validatorRUC" type="natural_person_ruc"
                                               validator-name="idValidator"></ecuadorian-identification-validation>
     </template>
 </test-fixture>
@@ -33,39 +33,39 @@
         test('instantiating the element works', function() {
             var element = fixture('basic');
             assert.equal(element.is, 'ecuadorian-identification-validation');
-            assert.equal(element.type, 'idCard');
+            assert.equal(element.type, 'id_card');
             assert.equal(element.validatorName, 'idValidator');
         });
 
         test('instantiating a RUC', function() {
             var element = fixture('ruc');
             assert.equal(element.is, 'ecuadorian-identification-validation');
-            assert.equal(element.type, 'RUC');
+            assert.equal(element.type, 'natural_person_ruc');
             assert.equal(element.validatorName, 'idValidator');
         });
 
         test('validate a good identification', function() {
             var element = fixture('basic');
-            assert.equal(element.type, 'idCard');
-            assert.isTrue(element.validate('1715140305'), 'the identification should have a 10 in length');
+            assert.equal(element.type, 'id_card');
+            assert.isTrue(element.validate('1715140305'), 'the identification should be correct');
         });
 
-        test('validate an bad identification with bad length', function() {
+        test('validate a bad identification with bad length', function() {
             var element = fixture('basic');
-            assert.equal(element.type, 'idCard');
-            assert.isFalse(element.validate('171514030'), 'the identification should have a 10 in length');
+            assert.equal(element.type, 'id_card');
+            assert.isFalse(element.validate('171514030'), 'the identification should have a length of 10');
         });
 
-        test('validate an bad identification with incorrect number', function() {
+        test('validate a bad identification with incorrect number', function() {
             var element = fixture('basic');
-            assert.equal(element.type, 'idCard');
-            assert.isFalse(element.validate('1715140306'), 'the identification should have a 10 in length');
+            assert.equal(element.type, 'id_card');
+            assert.isFalse(element.validate('1715140306'), 'the identification should be incorrect');
         });
 
-        test('validate an bad identification with incorrect number', function() {
-            var element = fixture('basic');
-            assert.equal(element.type, 'idCard');
-            assert.isFalse(element.validate('1715880305'), 'the identification should have a 10 in length');
+        test('validate a good identification ', function() {
+            var element = fixture('ruc');
+            assert.isTrue(element.validate('1710034065001'), 'the identification should be correct');
+            assert.equal(element.type, 'natural_person_ruc');
         });
 
     });

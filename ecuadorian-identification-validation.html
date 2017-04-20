@@ -29,7 +29,8 @@ This element inherits from the iron-validator-behavior and override the validati
                  */
                 type: {
                     type: String,
-                    value: 'idCard'
+                    changed: 'typeChanged',
+                    value: 'id_card'
                 },
                 /**
                  * Used to verify what kind of identifier is.
@@ -70,13 +71,50 @@ This element inherits from the iron-validator-behavior and override the validati
              */
             validate: function(value) {
                 if (value.length === 13) {
-                    //TODO implement RUC validation
-                    return this.validateIdCard(value);
+                    return this.validateRUC(value);
                 } else if (value.length === 10) {
                     return this.validateIdCard(value);
                 } else {
                     return false;
                 }
+            },
+
+            /**
+             * Verify if the ruc is correct according to the ecuadorian id verification.
+             * @param {Object} values The value to validate. May be any type depending on the validation logic.
+             * @return {Boolean} true if `values` is valid.
+             */
+            validateRUC: function(value) {
+                var id = String(value);
+                var thirdNumber = id.substring(2, 3);
+                if (this._checkBusiness(id)) {
+                    if (thirdNumber < 6) {
+                        this.type = 'natural_person_ruc';
+                        return this.validateIdCard(value);
+                    } else {
+                        switch (thirdNumber) {
+                            case 6:
+                                //TODO implement login for public RUC
+                                break;
+                            case 9:
+                                //TODO implement login for judical foreign RUC
+                                break;
+                        }
+                    }
+                } else {
+                    return false;
+                }
+
+            },
+
+            /**
+             * validates that the business has at least one business.
+             * @param {Number} identification.
+             * @return {Boolean} true if `values` is valid.
+             */
+            _checkBusiness: function(value) {
+                businessTotal = value.substring(9, 12);
+                return businessTotal !== '000';
             },
 
             /**
@@ -139,6 +177,31 @@ This element inherits from the iron-validator-behavior and override the validati
              */
             _between: function(x, min, max) {
                 return x >= min && x <= max;
+            },
+
+            typeChanged: function(type) {
+                switch (type) {
+                    case 'id_card':
+                        this._coefficients = ["2", "1", "2", "1", "2", "1", "2", "1", "2"];
+                        this._thirdDigit = 6;
+                        break;
+                    case 'natural_person_ruc':
+                        this._coefficients = ["2", "1", "2", "1", "2", "1", "2", "1", "2"];
+                        this._thirdDigit = 6;
+                        break;
+                    case 'juridical_foreign_ruc':
+                        this._coefficients = ["4", "3", "2", "7", "6", "5", "4", "3", "2"];
+                        this._thirdDigit = 9;
+                        break;
+                    case 'public_ruc':
+                        this._coefficients = ["3", "2", "7", "6", "5", "4", "3", "2"];
+                        this._thirdDigit = 6;
+                        break;
+                    default:
+                        this._coefficients = ["2", "1", "2", "1", "2", "1", "2", "1", "2"];
+                        this._thirdDigit = 6;
+                        break;
+                }
             }
         });
     </script>
