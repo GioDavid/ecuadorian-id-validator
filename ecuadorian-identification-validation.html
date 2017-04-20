@@ -52,7 +52,9 @@ This element inherits from the iron-validator-behavior and override the validati
                     type: Number,
                     value: 22
                 },
-
+                /**
+                 * Verification coefficients of the ecuadorian idCard.
+                 */
                 _coefficients: {
                     type: Array,
                     value: function() {
@@ -89,8 +91,10 @@ This element inherits from the iron-validator-behavior and override the validati
                 var thirdNumber = id.substring(2, 3);
 
                 if (this._between(province, this._minProvince, this._maxProvince) && thirdNumber < this._thirdDigit) {
+
                     var digits = this._splitIdentification(value);
                     return this._getVerifyTotal(digits);
+
                 } else {
                     return false;
                 }
@@ -116,7 +120,13 @@ This element inherits from the iron-validator-behavior and override the validati
                 return verifyNumber === String(verifyDigit);
             },
 
+            /**
+             * Make a list with all the numbers contained in the identification.
+             * @param {String} value to split.
+             * @return {Boolean} true if `values` is valid.
+             */
             _splitIdentification: function(value) {
+                var numbers = [];
                 return numbers = value.split('');
             },
 
