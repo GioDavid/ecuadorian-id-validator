@@ -23,9 +23,22 @@
         <template>
             <ecuadorian-identification-validation id="validator"
                                                   validator-name="idValidator"></ecuadorian-identification-validation>
-            <paper-input auto-validate validator='idValidator' allowed-pattern="\d" floatinglabel class="child"
-                         maxlength="10" id="identification" name="ruc" error-message="Incorrect identification"
-                         label="Identification">
+            <paper-input auto-validate validator='idValidator' allowed-pattern="\d" floatinglabel
+                         maxlength="10" id="identification" error-message="Incorrect identification"
+                         label="This input only validate an ecuadorian id card">
+            </paper-input>
+        </template>
+    </demo-snippet>
+</div>
+<div class="vertical-section-container centered">
+    <h3>RUC and Identification ecuadorian-identification-validation demo using in paper input</h3>
+    <demo-snippet>
+        <template>
+            <ecuadorian-identification-validation id="rucValidator"
+                                                  validator-name="rucValidator"></ecuadorian-identification-validation>
+            <paper-input auto-validate validator='rucValidator' allowed-pattern="\d" floatinglabel
+                         maxlength="13" id="ruc" error-message="Incorrect RUC"
+                         label="This input validates an ecuadorian id card or any ecuadorian RUC">
             </paper-input>
         </template>
     </demo-snippet>
