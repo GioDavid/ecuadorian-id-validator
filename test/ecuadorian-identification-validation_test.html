@@ -74,6 +74,23 @@
             assert.equal(element.type, 'natural_person_ruc');
         });
 
+        test('validate a good juridical identification', function() {
+            var element = fixture('ruc');
+            assert.isTrue(element.validate('1790085783001'), 'the identification should be correct');
+            assert.equal(element.type, 'juridical_foreign_ruc');
+        });
+
+        test('validate a bad juridical identification with no businesses', function() {
+            var element = fixture('ruc');
+            assert.isFalse(element.validate('1790085783000'), 'the identification should be correct');
+        });
+
+        test('validate a bad juridical identification with bad identification', function() {
+            var element = fixture('ruc');
+            assert.isFalse(element.validate('1790485783001'), 'the identification should be correct');
+            assert.equal(element.type, 'juridical_foreign_ruc');
+        });
+
     });
 </script>
 </body>

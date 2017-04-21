@@ -28,7 +28,6 @@ This element inherits from the iron-validator-behavior and override the validati
                  */
                 type: {
                     type: String,
-                    changed: 'typeChanged',
                     value: 'id_card'
                 },
                 /**
@@ -72,6 +71,7 @@ This element inherits from the iron-validator-behavior and override the validati
                 if (value.length === 13) {
                     return this.validateRUC(value);
                 } else if (value.length === 10) {
+                    this.setNaturalPersonProperties('id_card');
                     return this.validateIdCard(value);
                 } else {
                     return false;
@@ -88,15 +88,16 @@ This element inherits from the iron-validator-behavior and override the validati
                 var thirdNumber = id.substring(2, 3);
                 if (this._checkBusiness(id)) {
                     if (thirdNumber < 6) {
-                        this.type = 'natural_person_ruc';
+                        this.setNaturalPersonProperties('natural_person_ruc');
                         return this.validateIdCard(value);
                     } else {
                         switch (thirdNumber) {
-                            case 6:
-                                //TODO implement login for public RUC
+                            case "6" || 6:
+                                this.setPublicRucProperties();
                                 break;
-                            case 9:
-                                //TODO implement login for judical foreign RUC
+                            case "9" || 9:
+                                this.setJuridicalProperties();
+                                return this.validateJuridicalForeignCard(value);
                                 break;
                         }
                     }
@@ -158,6 +159,46 @@ This element inherits from the iron-validator-behavior and override the validati
             },
 
             /**
+             * Verify if the idCard is correct according to the ecuadorian id verification.
+             * @param {Object} values The value to validate. May be any type depending on the validation logic.
+             * @return {Boolean} true if `values` is valid.
+             */
+            validateJuridicalForeignCard: function(value) {
+
+                var id = String(value);
+                var province = id.substring(0, 2);
+                var thirdNumber = id.substring(2, 3);
+
+                if (this._between(province, this._minProvince, this._maxProvince)) {
+
+                    var digits = this._splitIdentification(value);
+                    return this._getVerifyJuridicalTotal(digits);
+
+                } else {
+                    return false;
+                }
+            },
+
+            /**
+             * this function verify if an ecuadorian idCard is correct.
+             * @param {Array} list of the numbers contained in the ecuadorian idCard.
+             * @return {Boolean} true if `values` is valid.
+             */
+            _getVerifyJuridicalTotal: function(digits) {
+
+                var verifyNumber = digits[9];
+                var total = 0;
+
+                for (var i = 0; i < this._coefficients.length; i++) {
+                    var value = this._coefficients[i] * digits[i];
+                    total = total + value;
+                }
+
+                var verifyDigit = 11 - (total % 11);
+
+                return verifyNumber === String(verifyDigit);
+            },
+            /**
              * Make a list with all the numbers contained in the identification.
              * @param {String} value to split.
              * @return {Boolean} true if `values` is valid.
@@ -178,29 +219,22 @@ This element inherits from the iron-validator-behavior and override the validati
                 return x >= min && x <= max;
             },
 
-            typeChanged: function(type) {
-                switch (type) {
-                    case 'id_card':
-                        this._coefficients = ["2", "1", "2", "1", "2", "1", "2", "1", "2"];
-                        this._thirdDigit = 6;
-                        break;
-                    case 'natural_person_ruc':
-                        this._coefficients = ["2", "1", "2", "1", "2", "1", "2", "1", "2"];
-                        this._thirdDigit = 6;
-                        break;
-                    case 'juridical_foreign_ruc':
-                        this._coefficients = ["4", "3", "2", "7", "6", "5", "4", "3", "2"];
-                        this._thirdDigit = 9;
-                        break;
-                    case 'public_ruc':
-                        this._coefficients = ["3", "2", "7", "6", "5", "4", "3", "2"];
-                        this._thirdDigit = 6;
-                        break;
-                    default:
-                        this._coefficients = ["2", "1", "2", "1", "2", "1", "2", "1", "2"];
-                        this._thirdDigit = 6;
-                        break;
-                }
+            setNaturalPersonProperties: function(type) {
+                this.type = type;
+                this._coefficients = ["2", "1", "2", "1", "2", "1", "2", "1", "2"];
+                this._thirdDigit = 6;
+            },
+
+            setJuridicalProperties: function() {
+                this.type = 'juridical_foreign_ruc';
+                this._coefficients = ["4", "3", "2", "7", "6", "5", "4", "3", "2"];
+                this._thirdDigit = 9;
+            },
+
+            setPublicRucProperties: function() {
+                this.type = 'public_ruc';
+                this._coefficients = ["3", "2", "7", "6", "5", "4", "3", "2"];
+                this._thirdDigit = 6;
             }
         });
     </script>
