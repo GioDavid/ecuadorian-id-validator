@@ -74,7 +74,7 @@
             assert.equal(element.type, 'natural_person_ruc');
         });
 
-        test('validate a good juridical identification', function() {
+        test('validate a good juridical or foreign identification', function() {
             var element = fixture('ruc');
             assert.isTrue(element.validate('1790085783001'), 'the identification should be correct');
             assert.equal(element.type, 'juridical_foreign_ruc');
@@ -97,12 +97,12 @@
             assert.equal(element.type, 'public_ruc');
         });
 
-        test('validate a bad juridical identification with no businesses', function() {
+        test('validate a bad public identification with no businesses', function() {
             var element = fixture('ruc');
             assert.isFalse(element.validate('1760001040000'), 'the identification should be correct');
         });
 
-        test('validate a bad juridical identification with bad identification', function() {
+        test('validate a bad public identification with bad identification', function() {
             var element = fixture('ruc');
             assert.isFalse(element.validate('1760031040012'), 'the identification should be correct');
             assert.equal(element.type, 'public_ruc');
