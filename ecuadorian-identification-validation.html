@@ -71,7 +71,7 @@ This element inherits from the iron-validator-behavior and override the validati
                 if (value.length === 13) {
                     return this.validateRUC(value);
                 } else if (value.length === 10) {
-                    this.setNaturalPersonProperties('id_card');
+                    this._setNaturalPersonProperties('id_card');
                     return this.validateIdCard(value);
                 } else {
                     return false;
@@ -88,15 +88,16 @@ This element inherits from the iron-validator-behavior and override the validati
                 var thirdNumber = id.substring(2, 3);
                 if (this._checkBusiness(id)) {
                     if (thirdNumber < 6) {
-                        this.setNaturalPersonProperties('natural_person_ruc');
+                        this._setNaturalPersonProperties('natural_person_ruc');
                         return this.validateIdCard(value);
                     } else {
                         switch (thirdNumber) {
                             case "6" || 6:
-                                this.setPublicRucProperties();
+                                this._setPublicRucProperties();
+                                return this.validatePublicCard(value);
                                 break;
                             case "9" || 9:
-                                this.setJuridicalProperties();
+                                this._setJuridicalProperties();
                                 return this.validateJuridicalForeignCard(value);
                                 break;
                         }
@@ -159,7 +160,7 @@ This element inherits from the iron-validator-behavior and override the validati
             },
 
             /**
-             * Verify if the idCard is correct according to the ecuadorian id verification.
+             * Verify if the juridicial or foreign identification is correct according to the ecuadorian verification.
              * @param {Object} values The value to validate. May be any type depending on the validation logic.
              * @return {Boolean} true if `values` is valid.
              */
@@ -180,13 +181,54 @@ This element inherits from the iron-validator-behavior and override the validati
             },
 
             /**
-             * this function verify if an ecuadorian idCard is correct.
+             * Verify if the public identification is correct according to the ecuadorian verification.
+             * @param {Object} values The value to validate. May be any type depending on the validation logic.
+             * @return {Boolean} true if `values` is valid.
+             */
+            validatePublicCard: function(value) {
+
+                var id = String(value);
+                var province = id.substring(0, 2);
+                var thirdNumber = id.substring(2, 3);
+
+                if (this._between(province, this._minProvince, this._maxProvince)) {
+
+                    var digits = this._splitIdentification(value);
+                    return this._getVerifyPublicIdentificationTotal(digits);
+
+                } else {
+                    return false;
+                }
+            },
+
+            /**
+             * this function verify if an ecuadorian juridical or foreign is correct.
              * @param {Array} list of the numbers contained in the ecuadorian idCard.
              * @return {Boolean} true if `values` is valid.
              */
             _getVerifyJuridicalTotal: function(digits) {
 
                 var verifyNumber = digits[9];
+                var total = 0;
+
+                for (var i = 0; i < this._coefficients.length; i++) {
+                    var value = this._coefficients[i] * digits[i];
+                    total = total + value;
+                }
+
+                var verifyDigit = 11 - (total % 11);
+
+                return verifyNumber === String(verifyDigit);
+            },
+
+            /**
+             * this function verify if an ecuadorian idCard is correct.
+             * @param {Array} list of the numbers contained in the ecuadorian idCard.
+             * @return {Boolean} true if `values` is valid.
+             */
+            _getVerifyPublicIdentificationTotal: function(digits) {
+
+                var verifyNumber = digits[8];
                 var total = 0;
 
                 for (var i = 0; i < this._coefficients.length; i++) {
@@ -219,19 +261,32 @@ This element inherits from the iron-validator-behavior and override the validati
                 return x >= min && x <= max;
             },
 
-            setNaturalPersonProperties: function(type) {
+            /**
+             * Sets the properties necessary for the operations to validate the natural id card.
+             * @param {String} type to be set for a natural person id or natural person ruc.
+             * @return {Boolean} true if `values` is valid.
+             */
+            _setNaturalPersonProperties: function(type) {
                 this.type = type;
                 this._coefficients = ["2", "1", "2", "1", "2", "1", "2", "1", "2"];
                 this._thirdDigit = 6;
             },
 
-            setJuridicalProperties: function() {
+            /**
+             * Sets the properties necessary for the operations to validate the juridical or foreign id card.
+             * @return {Boolean} true if `values` is valid.
+             */
+            _setJuridicalProperties: function() {
                 this.type = 'juridical_foreign_ruc';
                 this._coefficients = ["4", "3", "2", "7", "6", "5", "4", "3", "2"];
                 this._thirdDigit = 9;
             },
 
-            setPublicRucProperties: function() {
+            /**
+             * Sets the properties necessary for the operations to validate the public ruc card.
+             * @return {Boolean} true if `values` is valid.
+             */
+            _setPublicRucProperties: function() {
                 this.type = 'public_ruc';
                 this._coefficients = ["3", "2", "7", "6", "5", "4", "3", "2"];
                 this._thirdDigit = 6;
